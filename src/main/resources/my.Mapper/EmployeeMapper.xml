@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--这个文档是mybatis的映射器，把对数据库的操作方法映射成Bean对象
+这个文档里面全是对数据库操作的描述性信息-->
+<mapper namespace="my.Mapper.EmployeeMapper">
+
+    <sql id="select_fields">
+        emp_id, emp_name, emp_email, gender, department_id
+    </sql>
+
+    <sql id="selectWithDept_fields">
+      emp_id, emp_name , emp_email , gender, department_id,
+     dept_id , dept_name , dept_leader
+
+    </sql>
+
+    <!-- 使用resultMap解决表的字段名与实体类的属性名不一致的情况 -->
+
+    <resultMap  id="withDeptResultMap" type="my.Bean.Employee" >
+        <result property="empId" column="emp_Id"/>
+        <result property="empName" column="emp_name"/>
+        <result property="empEmail" column="emp_email"/>
+        <result property="departmentId" column="department_id"/>
+        <result property="gender" column="gender"/>
+        <association property="department" column="department_id" javaType="my.Bean.Department">
+            <result column="dept_id" property="deptId"/>
+            <result column="dept_name" property="deptName"/>
+            <result column="dept_leader" property="deptLeader"/>
+        </association>
+    </resultMap>
+
+    <select id="selectOneByEmp_id" parameterType="java.lang.Integer" resultType="my.Bean.Employee">
+        SELECT
+            emp_id  empId, emp_name empName, emp_email empEmail, gender, department_id deaprtmentId
+        FROM
+            tbl_emp
+        WHERE
+            emp_id=#{empId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectOneByEmp_name" parameterType="String" resultType="my.Bean.Employee">
+        SELECT
+            emp_id  empId, emp_name empName, emp_email empEmail, gender, department_id deaprtmentId
+        FROM
+            tbl_emp
+        WHERE
+            emp_name=#{empName, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectWithDeptById" parameterType="Integer" resultMap="withDeptResultMap">
+        select
+        <include refid="selectWithDept_fields"/>
+        from
+        tbl_emp e, tbl_dept d
+        where
+        e.department_id =d.dept_id
+        and
+        e.emp_id =#{empId}
+    </select>
+
+    <select id="selectByLimitAndOffset" resultMap="withDeptResultMap">
+        select
+        <include refid="selectWithDept_fields"></include>
+        from
+        tbl_emp e
+        left join
+        tbl_dept d
+        on
+        e.department_id = d.dept_id
+        order by
+        e.emp_id
+        LIMIT  #{offset},#{limit}
+    </select>
+
+    <update id="updateOneById" parameterType="my.Bean.Employee">
+<!--Mapper中声明的方法，在绑定的映射文件中必须能找到对应的sql标签，且方法名与对应的sql标签的id值必须相同。-->
+        update
+            tbl_emp
+        set
+            emp_email=#{empEmail, jdbcType=VARCHAR},
+            gender=#{gender, jdbcType=VARCHAR},
+            department_id=#{departmentId, jdbcType=Integer}
+        where
+                emp_id = #{empId,jdbcType=Integer}
+    </update>
+</mapper>

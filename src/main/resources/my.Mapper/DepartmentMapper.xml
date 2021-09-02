@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="my.Mapper.DepartmentMapper">
+    <sql id="select_fields">
+        dept_id as deptId, dept_name as deptName, dept_leader as deptLeader
+    </sql>
+
+    <update id="updateOneByDept_id" parameterType="my.Bean.Department">
+        update
+            tbl_dept
+        set
+            dept_name=#{deptName}, dept_leader=#{deptLeader}
+        where
+              dept_id=#{deptId}
+    </update>
+    <delete id="deleteOneByDept_id" parameterType="Integer">
+        delete from
+                    tbl_dept
+        where
+              dept_id=#{deptId, jdbcType=varchar}
+    </delete>
+    <insert id="insertOne" parameterType="Integer">
+        insert into
+            tbl_dept select_fields
+            values(#{deptId}, #{deptName}, #{deptLeader})
+    </insert>
+    <select id="selectOneByDept_id" parameterType="Integer" resultType="my.Bean.Department">
+        select
+               <include refid="select_fields"></include>
+        from
+             tbl_dept
+        where  dept_id=#{deptId,  jdbcType=varchar}
+    </select>
+    <select id="selectOneByDept_name" parameterType="String" resultType="my.Bean.Department">
+        select
+        <include refid="select_fields"></include>
+        from
+             tbl_dept
+        where
+              dept_name=#{deptName, jdbcType=varchar}
+    </select>
+    <select id="selectOneByDept_leader" parameterType="String" resultType="my.Bean.Department">
+        select
+        <include refid="select_fields"></include>
+        from
+        tbl_dept
+        where
+        dept_leader=#{deptLeader, jdbcType=varchar}
+    </select>
+    <select id="selectDeptByLimitAndOffset"  resultMap="deptResult">
+        select
+          <include refid="select_fields"></include>
+        from
+          tbl_dept
+        LIMIT
+         #{offset}, #{limit}
+    </select>
+
+    <resultMap id="deptResult" type="my.Bean.Department">
+        <id column="dept_id" property="deptId"></id>
+        <result column="dept_name" property="deptName"></result>
+        <result column="dept_leader" property="deptLeader"></result>
+    </resultMap>
+
+    <select id="checkDeptExistsByNameAndLeader" resultType="Integer">
+        select count(dept_id)
+        from tbl_dept
+        where deptLeader = #{deptLeader}
+           or deptName = #{deptName}
+    </select>
+</mapper>

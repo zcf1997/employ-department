@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+<!--上面这些版本要跟jar包一致，否则报错-->
+
+    <!--使用注解驱动-->
+    <mvc:annotation-driven/>
+    <!--处理静态资源-->
+    <mvc:default-servlet-handler/>
+    <context:component-scan base-package="my.Controller"/>
+
+    <!--找到web工程/WEB-INF/jsp/文件夹，且文件结尾为jsp的文件作为映射-->
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/WEB-INF/jsp/"/>
+    <property name="suffix" value=".jsp"/>
+    </bean>
+    <!--如有配置数据库事务，需要开启注解事务的，需要开启这段代码-->
+
+    <!--tx:annotation-driven transaction-manager="transactionManger"/-->
+</beans>
